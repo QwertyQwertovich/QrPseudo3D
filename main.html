@@ -1,0 +1,32 @@
+<!doctype html>
+<html>
+	<head>
+		<title>by Kharitonov Alexander</title>
+        <meta charset='utf-8' />
+	</head>
+	<body>
+		<canvas height='320' width='480' id='example'>Update the browser</canvas>
+		<script>
+			var example = document.getElementById("example"),
+			    ctx     = example.getContext('2d');
+			var level = [[1,1,1,1,1,1,1,1],[1,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,1],[1,1,1,1,1,1,1,1]];
+			var x = 10,y=10,a=0;
+			function raycast(){
+				for (var ray=-30;ray<30;ray++){
+					for(var i=0;i<level.length;i++){
+						for(var j=0;j<level[i].length;j++){
+							if(level[i][j]==1){
+								var blockx = i*20,blocky = j*20;
+								
+							}
+						}
+					}
+				}
+			}
+			function gri(max) {
+				return Math.floor(Math.random() * Math.floor(max));
+			};
+		</script>
+		<text> by Qwerty_Qwertovich(Alexander Kharitonov)</text>
+	</body>
+</html>
