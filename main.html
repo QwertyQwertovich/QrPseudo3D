@@ -9,22 +9,39 @@
 		<script>
 			var example = document.getElementById("example"),
 			    ctx     = example.getContext('2d');
-			var level =[[70,-100,70,200],[60,50,60,100],[0,70,100,70]]
+			var level =[[70,-100,70,200],[0,70,100,70],[0,60,50,60]]
 			//var level =[[70,0,70,100]]
-			var x = 50,y=50,a=0,fov=40,alfa=20;
-			function rast(x,y,z){
-				return(Math.sqrt((x-z[0])*(x-z[0])+(y-z[1])*(y-z[1])));
+			var x = 50,y=50,a=0,fov=40,alfa=20,xx=0,yy=0,k=-1;
+			function rast(k,x,y,z){
+				return(k*Math.sqrt((x-z[0])*(x-z[0])+(y-z[1])*(y-z[1])));
 			};
 			function lineline(x1,y1,x2,y2,x3,y3,x4,y4){
 				xp = ((x1*y2-y1*x2)*(x3-x4)-(x1-x2)*(x3*y4-y3*x4))/((x1-x2)*(y3-y4)-(y1-y2)*(x3-x4));
 				yp = ((x1*y2-y1*x2)*(y3-y4)-(y1-y2)*(x3*y4-y3*x4))/((x1-x2)*(y3-y4)-(y1-y2)*(x3-x4));
-				if (xp>x1 && xp<x2 && yp>y1 && yp<y2){
+				//console.log(xp,yp,x1,y1,x2,y2)
+	      if (!((x1 < xp && x2 < xp) || (x1 > xp && x2 > xp))){
+				  //console.log(xp,yp)
 					return [xp,yp];
 				};
-				return [xp,yp];
+				return [1000,1000];
 			};
-			//setInterval(draw, 20);
-			draw();
+			function drawminimap(){
+			  ctx.fillStyle='blue'
+			  for (var i=0;i<level.length;i++){
+			    ctx.beginPath();
+			    ctx.moveTo(level[i][0],level[i][1]);
+			    ctx.lineTo(level[i][2],level[i][3]);
+			    ctx.closePath();
+			    ctx.stroke()
+			  }
+			  ctx.beginPath();
+			  ctx.moveTo(x,y);
+			  ctx.lineTo(xx*k,yy*k);
+			  ctx.closePath();
+			  ctx.stroke();
+			}
+			setInterval(draw, 50);
+			//draw();
 			//console.log(lineline(1,22,333,44,56,64,73,68));
 			function draw(){
 				ctx.clearRect(0,0,example.width, example.height);
@@ -32,12 +49,14 @@
 			    ctx.fillRect(0, 0, example.width, example.height);
 			    ctx.fillStyle='red';
 				dist=raycast(alfa,fov);
-				console.log(dist)
+			//	console.log(dist)
 				for(var i=alfa-fov;i<alfa+fov;i++){
+				 // console.log(dist[i],i)
 					//console.log(alfa,example.width*(i+fov)/fov/2, example.height/2-(1/dist[i])*500, example.width/fov/2, (1/dist[i])*1000)
-					ctx.fillRect(example.width*(i+fov)/fov/2, example.height/2-(1/dist[i])*500,example.width/fov/2, (1/dist[i])*1000);
+					ctx.fillRect(example.width*(i-alfa+fov)/fov/2, example.height/2-(1/dist[i])*500,example.width/fov/2, (1/dist[i])*1000);
 				}
-				alfa=alfa
+				drawminimap();
+				alfa=alfa+1
 			};
 			function raycast(alfa,fov){
 				var rays = [],dist=[]
@@ -45,14 +64,18 @@
 					rays[ray]=1000
 					dist[ray]=1000
 					for(var i=0;i<level.length;i++){
-						var xx=x+10;
-						var yy=y+10*Math.tan(ray*3.141592/180);
+						xx=x+10;
+						yy=y+10*Math.tan(ray*3.141592/180);
 						//console.log(x1,y1)
 						var x1=level[i][0],y1=level[i][1],x2=level[i][2],y2=level[i][3],x3=level[i][4];
 						rayy = lineline(x1,y1,x2,y2,x,y,xx,yy);
-						rastt = rast(x,y,rayy)
+						k=-1;
+						if ((rayy[0]>x && ray>0)||(rayy[0]<x && ray<0)){
+						  k=1
+						}
+						rastt = rast(k,x,y,rayy)
 						//console.log(rayy,rastt)
-						console.log(alfa,ray)
+					//	console.log(alfa,ray)
 						if (dist[ray]>rastt){
 							dist[ray]=rastt;
 							rayy[ray]=rayy;
