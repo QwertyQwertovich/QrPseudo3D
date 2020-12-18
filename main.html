@@ -9,18 +9,14 @@
 		<script>
 			var example = document.getElementById("example"),
 			    ctx     = example.getContext('2d');
-			var level = [[1,1,1,1,1,1,1,1],[1,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,1],[1,1,1,1,1,1,1,1]];
-			var x = 10,y=10,a=0;
+			var level =[[70,0,70,100],[0,70,100,70]]
+			var x = 50,y=50,a=0,rast=10;
 			function raycast(){
 				for (var ray=-30;ray<30;ray++){
 					for(var i=0;i<level.length;i++){
-						for(var j=0;j<level[i].length;j++){
-							if(level[i][j]==1){
-								var blockx = i*20,blocky = j*20;
-								
-							}
-						}
-					}
+					  var x1=level[i][0],y1=level[i][1]
+					  var x2=level[i][2],y2=level[i][3]
+					  
 				}
 			}
 			function gri(max) {
