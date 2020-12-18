@@ -41,8 +41,8 @@
 			  ctx.stroke();
 			  ctx.fillRect(example.width/2,0,10, example.height)
 			}
-			setInterval(draw, 100);
-			//draw();
+			setInterval(draw, 20);
+	//		draw();
 			//console.log(lineline(1,22,333,44,56,64,73,68));
 			function draw(){
 				ctx.clearRect(0,0,example.width, example.height);
@@ -52,6 +52,9 @@
 				dist=raycast(alfa,fov);
 			//	console.log(dist)
 				for(var i=alfa-fov;i<alfa+fov;i++){
+				  var color='rgb('+(255-dist[i]*4).toString()+',0,0)'
+				  ctx.fillStyle=color
+				 //console.log(color,toString(dist[i]))
 				 // console.log(dist[i],i)
 					//console.log(alfa,example.width*(i+fov)/fov/2, example.height/2-(1/dist[i])*500, example.width/fov/2, (1/dist[i])*1000)
 					ctx.fillRect(example.width*(i-alfa+fov)/fov/2, example.height/2-(1/dist[i])*500,example.width/fov/2, (1/dist[i])*1000);
@@ -68,8 +71,8 @@
 					rays[ray]=1000
 					dist[ray]=1000
 					for(var i=0;i<level.length;i++){
-						xx=x+10;
-						yy=y+10*Math.tan(ray*3.141592/180);
+						xx=x+20;
+						yy=y+20*Math.tan(ray*3.141592/180);
 						if (ray==alfa){
 						  xxx=xx
 						  yyy=yy
