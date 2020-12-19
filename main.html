@@ -94,7 +94,7 @@
 //		  if ((rayy[0]>x && ray>-90)||(rayy[0]<x && ray<-90)){
 						  k=1;}
 			//		}
-						rastt = rast(k,x,y,rayy)
+						rastt = rast(k,x,y,rayy)*Math.cos((ray-alfa+0.1)*3.141592/180)
 						//console.log(rayy,rastt)
 					//	console.log(alfa,ray)
 						if (dist[ray]>rastt && rastt>0){
