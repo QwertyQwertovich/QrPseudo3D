@@ -9,9 +9,9 @@
 		<script>
 			var example = document.getElementById("example"),
 			    ctx     = example.getContext('2d');
-			var level =[[70,0,70,75],[0,70,100,70],[0,60,50,60],[0,40,100,40]]
+			var level =[[0,0,0,80],[0,80,20,80],[20,80,20,90],[20,90,30,90],[30,90,30,80],[30,80,40,80],[40,80,40,110],[40,110,60,110],[60,110,60,80],[60,80,90,80],[90,80,90,0],[90,0,0,0],[20,0,20,20],[30,20,30,70],[80,40,80,70],[80,70,50,70],[50,70,50,40],[50,40,80,40],[80,10,80,20],[80,20,60,20],[60,20,60,10],[60,10,80,10]]
 			//var level =[[70,0,70,100]]
-			var x = 50,y=50,a=0,fov=40,alfa=20,xx=0,yy=0,k=-1,xxx=0,yyy=0,turnleft=false,turnright=false, forward=false,speed=0.5;
+			var x = 50,y=100,a=0,fov=40,alfa=20,xx=0,yy=0,k=-1,xxx=0,yyy=0,turnleft=false,turnright=false, forward=false,speed=0.5;
 			example.addEventListener('mousedown',function(e) {
         var rect = example.getBoundingClientRect();
         if(example.height-e.clientY+rect.y<100 && e.clientX-rect.x<example.width/2){
@@ -141,6 +141,9 @@
 						rastt = rast(k,x,y,rayy)*Math.cos((ray-alfa+0.1)*3.141592/180)
 						//console.log(rayy,rastt)
 					//	console.log(alfa,ray)
+					if (rastt>0 && rastt<1 && ray==alfa){
+					  forward=false
+					}
 						if (dist[ray]>rastt && rastt>0){
 							dist[ray]=rastt;
 							rayy[ray]=rayy;
