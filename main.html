@@ -11,7 +11,37 @@
 			    ctx     = example.getContext('2d');
 			var level =[[70,0,70,75],[0,70,100,70],[0,60,50,60],[0,40,100,40]]
 			//var level =[[70,0,70,100]]
-			var x = 50,y=50,a=0,fov=40,alfa=20,xx=0,yy=0,k=-1,xxx=0,yyy=0;
+			var x = 50,y=50,a=0,fov=40,alfa=20,xx=0,yy=0,k=-1,xxx=0,yyy=0,turnleft=false,turnright=false, forward=false,speed=0.5;
+			example.addEventListener('mousedown',function(e) {
+        var rect = example.getBoundingClientRect();
+        if(example.height-e.clientY+rect.y<100 && e.clientX-rect.x<example.width/2){
+          console.log('left',turnleft)
+          if (turnleft){
+            turnleft=false
+          }
+          else{
+            turnleft=true
+          }
+        }
+        if(example.height-e.clientY+rect.y<100 && e.clientX-rect.x>example.width/2){
+          console.log('right', turnright)
+          if (turnright){
+            turnright=false
+          }
+          else{
+            turnright=true
+          }
+        }
+        if(example.height-e.clientY+rect.y>100 && e.clientX-rect.x>100){
+          console.log('forward', forward)
+          if (forward){
+            forward=false
+          }
+          else{
+            forward=true
+          }
+        }
+			});
 			function rast(k,x,y,z){
 				return(k*Math.sqrt((x-z[0])*(x-z[0])+(y-z[1])*(y-z[1])));
 			};
@@ -61,9 +91,21 @@
 					ctx.fillRect(example.width*(i-alfa+fov)/fov/2, example.height/2-(1/dist[i])*500,example.width/fov/2, (1/dist[i])*1000);
 				}
 				drawminimap();
-				alfa=alfa+1
-				if (alfa==360){
-				  alfa=0;
+				if (turnright){
+				  alfa=alfa+1
+				}
+				if (turnleft){
+				  alfa=alfa-1
+				}
+				if (forward){
+				  x=x+speed*Math.cos(alfa*3.141592/180)
+				  y=y+speed*Math.sin(alfa*3.141592/180)
+				}
+				if (alfa==361){
+				  alfa=1;
+				}
+				if (alfa==-1){
+				  alfa=359
 				}
 			//	console.log(alfa)
 			};
