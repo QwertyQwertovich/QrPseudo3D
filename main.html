@@ -9,7 +9,7 @@
 		<script>
 			var example = document.getElementById("example"),
 			    ctx     = example.getContext('2d');
-			var level =[[70,-100,70,200],[0,70,100,70],[0,60,50,60]]
+			var level =[[70,0,70,75],[0,70,100,70],[0,60,50,60],[0,40,100,40]]
 			//var level =[[70,0,70,100]]
 			var x = 50,y=50,a=0,fov=40,alfa=20,xx=0,yy=0,k=-1,xxx=0,yyy=0;
 			function rast(k,x,y,z){
@@ -23,7 +23,7 @@
 				  //console.log(xp,yp)
 					return [xp,yp];
 				};
-				return [1000,1000];
+				return [100000,100000];
 			};
 			function drawminimap(){
 			  ctx.fillStyle='blue'
@@ -34,12 +34,13 @@
 			    ctx.closePath();
 			    ctx.stroke()
 			  }
+			  ctx.fillStyle='yellow'
 			  ctx.beginPath();
 			  ctx.moveTo(x,y);
-			  ctx.lineTo(xxx*k,yyy*k);
+			  ctx.lineTo(x+1,y+1);
 			  ctx.closePath();
 			  ctx.stroke();
-			  ctx.fillRect(example.width/2,0,10, example.height)
+			  ctx.fillRect(example.width/2,0,1, example.height)
 			}
 			setInterval(draw, 20);
 	//		draw();
@@ -64,15 +65,22 @@
 				if (alfa==360){
 				  alfa=0;
 				}
+			//	console.log(alfa)
 			};
 			function raycast(alfa,fov){
 				var rays = [],dist=[]
 				for (var ray=alfa-fov;ray<alfa+fov;ray++){
-					rays[ray]=1000
-					dist[ray]=1000
+					rays[ray]=100000
+					dist[ray]=100000
 					for(var i=0;i<level.length;i++){
-						xx=x+20;
-						yy=y+20*Math.tan(ray*3.141592/180);
+					  if ((ray>-90 && ray<90)|| ray>270){
+						  xx=x+2000;
+						  yy=y+2000*Math.tan(ray*3.141592/180);
+					  }
+					  else{
+					    xx=x-2000;
+						  yy=y-2000*Math.tan(ray*3.141592/180);
+					  }
 						if (ray==alfa){
 						  xxx=xx
 						  yyy=yy
@@ -81,13 +89,15 @@
 						var x1=level[i][0],y1=level[i][1],x2=level[i][2],y2=level[i][3],x3=level[i][4];
 						rayy = lineline(x1,y1,x2,y2,x,y,xx,yy);
 						k=-1;
-				//  if ((rayy[0]>x && ray>-90)||(rayy[0]<x && ray<-90)){
-						  k=1
-					//	}
+					//	if (rayy[0]-x>0){
+					if (!((xx < rayy[0] && x < rayy[0]) || (xx > rayy[0] && x > rayy[0]))){
+//		  if ((rayy[0]>x && ray>-90)||(rayy[0]<x && ray<-90)){
+						  k=1;}
+			//		}
 						rastt = rast(k,x,y,rayy)
 						//console.log(rayy,rastt)
 					//	console.log(alfa,ray)
-						if (dist[ray]>rastt){
+						if (dist[ray]>rastt && rastt>0){
 							dist[ray]=rastt;
 							rayy[ray]=rayy;
 						};
