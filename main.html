@@ -1,243 +1,320 @@
 <!doctype html>
 <html>
-	<head>
-		<title>by Kharitonov Alexander</title>
-        <meta charset='utf-8' />
-	</head>
-	<body>
-		<canvas height='320' width='480' id='example'>Update the browser</canvas>
-		<script>
-			var speed=1,sensivity=1,damage=0.5,mydamage=2;
-			var example = document.getElementById("example");
-			    ctx     = example.getContext('2d');
-			var level =[[0,0,0,80,1,"green"],[0,80,20,80,1,"green"],[20,80,20,90,1,"green"],[20,90,30,90,1,"green"],[30,90,30,80,1,"green"],[30,80,40,80,1,"green"],[40,80,40,110,1,"green"],[40,110,60,110,1,"green"],[60,110,60,80,1,"green"],[60,80,90,80,1,"green"],[90,80,90,0,1,"green"],[90,0,0,0,1,"green"],[20,0,20,20,1,"green"],[30,20,30,70,1,"green"],[80,40,80,70,1,"green"],[80,70,50,70,1,"green"],[50,70,50,40,1,"green"],[50,40,80,40,1,"green"],[80,10,80,20,1,"green"],[80,20,60,20,1,"green"],[60,20,60,10,1,"green"],[60,10,80,10,1,"green"],[40,90,50,90,1,"green"],[0,50,20,50,1,"green"],[20,50,20,40,1,"green"],[20,80,20,70,1,"green"],[25.5,85.5,25,85,1,"red"],[10.5,10.5,10,10,1,"red"],[40.5,30.5,40,30,1,"red"],[25.5,75.5,25,75,1,"red"],[50.5,80.5,50,80,1,"red"],[10.5,40.5,10,40,1,"red"],[10.5,70.5,10,70,1,"red"],[85.5,5.5,85,5,1,"red"]];                                                                
-			var enemies = [[25,85],[10,10],[40,30],[25,75],[50,80],[10,40],[10,70],[85,5]];
-			var x = 50,y=100,a=0,fov=30,alfa=270,xx=0,yy=0,k=-1,xxx=0,yyy=0,turnleft=false,turnright=false, forward=false,health=100,back=false;
-			document.addEventListener("keydown", function(event) {
-				if (event.keyCode==87){
-					forward=true;
-				};
-				if (event.keyCode==83){
-					back=true;
-				};
-				if (event.keyCode==65){
-					turnleft=true;
-				};
-				if (event.keyCode==68){
-					turnright=true;
-				};
-				console.log(event.keyCode);
-			});
-			document.addEventListener("keyup", function(event) {
-				if (event.keyCode==87){
-					forward=false;
-				};
-				if (event.keyCode==83){
-					back=false;
-				};
-				if (event.keyCode==65){
-					turnleft=false;
-				};
-				if (event.keyCode==68){
-					turnright=false;
-				};
-			});
-			example.addEventListener('mousedown',function(e) {
-        var rect = example.getBoundingClientRect();
-        if(example.height-e.clientY+rect.y<100 && e.clientX-rect.x<example.width/2){
-          if (turnleft){
-            turnleft=false;
-          }
-          else{
-            turnleft=true;
-          };
-        };
-        if(example.height-e.clientY+rect.y<100 && e.clientX-rect.x>example.width/2){
-          if (turnright){
-            turnright=false;
-          }
-          else{
-            turnright=true;
-          };
-        };
-        if(example.height-e.clientY+rect.y>100 && e.clientX-rect.x>100 && e.clientX-rect.x<example.width/2){
-          if (forward){
-            forward=false;
-          }
-          else{
-            forward=true;
-          };
-        };
-		if (example.height-e.clientY+rect.y>100 && e.clientX-rect.x>example.width/2){
-			dist=raycast(alfa,1);
-			if (dist[alfa][1]=="red"){
-				t=100000;
-				k=0;
-				for (var i=0;i<enemies.length;i++){
-					if (Math.abs(rast(1,x,y,[enemies[i][0],enemies[i][1]])-dist[alfa][0])<t){
-						t=Math.abs(rast(1,x,y,[enemies[i][0],enemies[i][1]])-dist[alfa][0]);
-						k=i;
-						};
+
+<head>
+	<title>by Kharitonov Alexander</title>
+	<meta charset='utf-8' />
+</head>
+
+<body>
+	<canvas height='320' width='480' id='example'>Update the browser</canvas>
+	<script>
+	var speed = 1,
+		sensivity = 1,
+		damage = 0.5,
+		mydamage = 2;
+	var example = document.getElementById("example");
+	ctx = example.getContext('2d');
+	var level = [
+		[0, 0, 0, 80, 1, "green"],
+		[0, 80, 20, 80, 1, "green"],
+		[20, 80, 20, 90, 1, "green"],
+		[20, 90, 30, 90, 1, "green"],
+		[30, 90, 30, 80, 1, "green"],
+		[30, 80, 40, 80, 1, "green"],
+		[40, 80, 40, 110, 1, "green"],
+		[40, 110, 60, 110, 1, "green"],
+		[60, 110, 60, 80, 1, "green"],
+		[60, 80, 90, 80, 1, "green"],
+		[90, 80, 90, 0, 1, "green"],
+		[90, 0, 0, 0, 1, "green"],
+		[20, 0, 20, 20, 1, "green"],
+		[30, 20, 30, 70, 1, "green"],
+		[80, 40, 80, 70, 1, "green"],
+		[80, 70, 50, 70, 1, "green"],
+		[50, 70, 50, 40, 1, "green"],
+		[50, 40, 80, 40, 1, "green"],
+		[80, 10, 80, 20, 1, "green"],
+		[80, 20, 60, 20, 1, "green"],
+		[60, 20, 60, 10, 1, "green"],
+		[60, 10, 80, 10, 1, "green"],
+		[40, 90, 50, 90, 1, "green"],
+		[0, 50, 20, 50, 1, "green"],
+		[20, 50, 20, 40, 1, "green"],
+		[20, 80, 20, 70, 1, "green"],
+		[25.5, 85.5, 25, 85, 1, "red"],
+		[10.5, 10.5, 10, 10, 1, "red"],
+		[40.5, 30.5, 40, 30, 1, "red"],
+		[25.5, 75.5, 25, 75, 1, "red"],
+		[50.5, 80.5, 50, 80, 1, "red"],
+		[10.5, 40.5, 10, 40, 1, "red"],
+		[10.5, 70.5, 10, 70, 1, "red"],
+		[85.5, 5.5, 85, 5, 1, "red"]
+	];
+	var enemies = [
+		[25, 85],
+		[10, 10],
+		[40, 30],
+		[25, 75],
+		[50, 80],
+		[10, 40],
+		[10, 70],
+		[85, 5]
+	];
+	var x = 50,
+		y = 100,
+		a = 0,
+		fov = 30,
+		alfa = 270,
+		xx = 0,
+		yy = 0,
+		k = -1,
+		xxx = 0,
+		yyy = 0,
+		turnleft = false,
+		turnright = false,
+		forward = false,
+		health = 100,
+		back = false;
+	document.addEventListener("keydown", function(event) {
+		if(event.keyCode == 87) {
+			forward = true;
+		};
+		if(event.keyCode == 83) {
+			back = true;
+		};
+		if(event.keyCode == 65) {
+			turnleft = true;
+		};
+		if(event.keyCode == 68) {
+			turnright = true;
+		};
+		console.log(event.keyCode);
+	});
+	document.addEventListener("keyup", function(event) {
+		if(event.keyCode == 87) {
+			forward = false;
+		};
+		if(event.keyCode == 83) {
+			back = false;
+		};
+		if(event.keyCode == 65) {
+			turnleft = false;
+		};
+		if(event.keyCode == 68) {
+			turnright = false;
+		};
+	});
+	example.addEventListener('mousedown', function(e) {
+		var rect = example.getBoundingClientRect();
+		if(example.height - e.clientY + rect.y < 100 && e.clientX - rect.x < example.width / 2) {
+			if(turnleft) {
+				turnleft = false;
+			} else {
+				turnleft = true;
+			};
+		};
+		if(example.height - e.clientY + rect.y < 100 && e.clientX - rect.x > example.width / 2) {
+			if(turnright) {
+				turnright = false;
+			} else {
+				turnright = true;
+			};
+		};
+		if(example.height - e.clientY + rect.y > 100 && e.clientX - rect.x > 100 && e.clientX - rect.x < example.width / 2) {
+			if(forward) {
+				forward = false;
+			} else {
+				forward = true;
+			};
+		};
+		if(example.height - e.clientY + rect.y > 100 && e.clientX - rect.x > example.width / 2) {
+			dist = raycast(alfa, 1);
+			if(dist[alfa][1] == "red") {
+				t = 100000;
+				k = 0;
+				for(var i = 0; i < enemies.length; i++) {
+					if(Math.abs(rast(1, x, y, [enemies[i][0], enemies[i][1]]) - dist[alfa][0]) < t) {
+						t = Math.abs(rast(1, x, y, [enemies[i][0], enemies[i][1]]) - dist[alfa][0]);
+						k = i;
 					};
-				level[level.length-enemies.length+k][4]=level[level.length-enemies.length+k][4]-mydamage/100;
-				if (level[level.length-enemies.length+k][4]<0){
-				level[level.length-enemies.length+k][0]=1000;
-				level[level.length-enemies.length+k][1]=1000;
-				level[level.length-enemies.length+k][2]=1000;
-				level[level.length-enemies.length+k][3]=1000;
-				enemies[k][0]=1000;
-				enemies[k][1]=1000;
+				};
+				level[level.length - enemies.length + k][4] = level[level.length - enemies.length + k][4] - mydamage / 100;
+				if(level[level.length - enemies.length + k][4] < 0) {
+					level[level.length - enemies.length + k][0] = 1000;
+					level[level.length - enemies.length + k][1] = 1000;
+					level[level.length - enemies.length + k][2] = 1000;
+					level[level.length - enemies.length + k][3] = 1000;
+					enemies[k][0] = 1000;
+					enemies[k][1] = 1000;
 				};
 			};
 		};
-			});
-			function rast(k,x,y,z){
-				return(k*Math.sqrt((x-z[0])*(x-z[0])+(y-z[1])*(y-z[1])));
+	});
+
+	function rast(k, x, y, z) {
+		return(k * Math.sqrt((x - z[0]) * (x - z[0]) + (y - z[1]) * (y - z[1])));
+	};
+
+	function lineline(x1, y1, x2, y2, x3, y3, x4, y4, ray) {
+		xp = ((x1 * y2 - y1 * x2) * (x3 - x4) - (x1 - x2) * (x3 * y4 - y3 * x4)) / ((x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4));
+		yp = ((x1 * y2 - y1 * x2) * (y3 - y4) - (y1 - y2) * (x3 * y4 - y3 * x4)) / ((x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4));
+		if((!((x1 + 0.1 < xp && x2 + 0.1 < xp) || (x1 - 0.1 > xp && x2 - 0.1 > xp))) && (!((y1 + 0.1 < yp && y2 + 0.1 < yp) || (y1 - 0.1 > yp && y2 - 0.1 > yp)))) {
+			return [xp, yp];
+		};
+		return [100000, 100000];
+	};
+
+	function drawminimap() {
+		ctx.fillStyle = 'blue';
+		for(var i = 0; i < level.length; i++) {
+			ctx.beginPath();
+			ctx.moveTo(level[i][0], level[i][1]);
+			ctx.lineTo(level[i][2], level[i][3]);
+			ctx.closePath();
+			ctx.stroke();
+		};
+		ctx.fillStyle = 'yellow';
+		ctx.beginPath();
+		ctx.moveTo(x, y);
+		ctx.lineTo(x + 1, y + 1);
+		ctx.closePath();
+		ctx.stroke();
+		ctx.fillRect(example.width / 2, example.height / 2, 2, 2);
+		ctx.fillText(Math.floor(x), example.width - 60, example.height - 10);
+		ctx.fillText(Math.floor(y), example.width - 40, example.height - 10);
+		ctx.fillText(Math.floor(alfa), example.width - 20, example.height - 10);
+	};
+	setInterval(draw, 20);
+
+	function draw() {
+		ctx.clearRect(0, 0, example.width, example.height);
+		ctx.fillStyle = 'lightblue';
+		ctx.fillRect(0, 0, example.width, example.height / 2);
+		ctx.fillStyle = 'brown';
+		ctx.fillRect(0, example.height / 2, example.width, example.height / 2);
+		ctx.fillStyle = 'black';
+		ctx.fillRect(example.width - 112, 8, 104, 24);
+		ctx.fillStyle = 'lightgreen';
+		ctx.fillRect(example.width - 110, 10, health, 20);
+		dist = raycast(alfa, fov);
+		enemy();
+		for(var i = alfa - fov; i < alfa + fov; i++) {
+			var color = 'rgb(0,' + (255 - dist[i][0] * 4).toString() + ',0)';
+			ctx.fillStyle = color;
+			if(dist[i][1] == 'red') {
+				ctx.fillStyle = 'red';
 			};
-			function lineline(x1,y1,x2,y2,x3,y3,x4,y4,ray){
-				xp = ((x1*y2-y1*x2)*(x3-x4)-(x1-x2)*(x3*y4-y3*x4))/((x1-x2)*(y3-y4)-(y1-y2)*(x3-x4));
-				yp = ((x1*y2-y1*x2)*(y3-y4)-(y1-y2)*(x3*y4-y3*x4))/((x1-x2)*(y3-y4)-(y1-y2)*(x3-x4));
-	      if ((!((x1+0.1 < xp && x2+0.1 < xp) || (x1-0.1 > xp && x2-0.1 > xp)))&&(!((y1+0.1 < yp && y2+0.1 < yp) || (y1-0.1 > yp && y2-0.1 > yp)))){
-					return [xp,yp];
-				};
-				return [100000,100000];
-			};
-			function drawminimap(){
-			  ctx.fillStyle='blue';
-			  for (var i=0;i<level.length;i++){
-			    ctx.beginPath();
-			    ctx.moveTo(level[i][0],level[i][1]);
-			    ctx.lineTo(level[i][2],level[i][3]);
-			    ctx.closePath();
-			    ctx.stroke();
-			  };
-			  ctx.fillStyle='yellow';
-			  ctx.beginPath();
-			  ctx.moveTo(x,y);
-			  ctx.lineTo(x+1,y+1);
-			  ctx.closePath();
-			  ctx.stroke();
-			  ctx.fillRect(example.width/2,example.height/2,2,2);
-			  ctx.fillText(Math.floor(x),example.width-60,example.height-10);
-			  ctx.fillText(Math.floor(y),example.width-40,example.height-10);
-			  ctx.fillText(Math.floor(alfa),example.width-20,example.height-10);
-			};
-			setInterval(draw, 20);
-			function draw(){
-				ctx.clearRect(0,0,example.width, example.height);
-			    ctx.fillStyle='lightblue';
-			    ctx.fillRect(0, 0, example.width, example.height/2);
-			    ctx.fillStyle='brown';
-			    ctx.fillRect(0,example.height/2,example.width,example.height/2);
-				ctx.fillStyle='black';
-				ctx.fillRect(example.width-112,8,104,24);
-			    ctx.fillStyle='lightgreen';
-				ctx.fillRect(example.width-110,10,health,20);
-				dist=raycast(alfa,fov);
-				enemy();
-				for(var i=alfa-fov;i<alfa+fov;i++){
-				  var color='rgb(0,'+(255-dist[i][0]*4).toString()+',0)';
-				  ctx.fillStyle=color;
-				  if (dist[i][1]=='red'){
-					ctx.fillStyle='red';
-				  };
-					ctx.fillRect(example.width*(i-alfa+fov)/fov/2, example.height/2-(1/dist[i][0])*500,example.width/fov/2, (1/dist[i][0])*1000);
-				};
-				drawminimap();
-				if (health>0){
-				  zz=0;
-				  for(var i=level.length-enemies.length;i<level.length;i++){
-				    if (level[i][0]!=1000){
-				      zz=1;
-				    };
-				  };
-				  if (zz==0){
-				    ctx.fillText("You win",example.width/2,example.height/2);
-				  };
-					if (turnright){
-					  alfa=alfa+sensivity;
-					};
-					if (turnleft){
-					  alfa=alfa-sensivity;
-					};
-					if (forward){
-					  x=x+speed*Math.cos((alfa+0.01)*3.141592/180);
-					  y=y+speed*Math.sin((alfa+0.01)*3.141592/180);
-					};
-					if (back){
-						x=x-speed*Math.cos((alfa+0.01)*3.141592/180);
-						y=y-speed*Math.sin((alfa+0.01)*3.141592/180);
-					};
-					if (alfa>360){
-					  alfa=alfa-360;
-					};
-					if (alfa<0){
-					  alfa=alfa+360;
-					};
-				}
-				else{
-					ctx.fillText("Game Over",example.width/2,example.height/2);
-					health=0;
+			ctx.fillRect(example.width * (i - alfa + fov) / fov / 2, example.height / 2 - (1 / dist[i][0]) * 500, example.width / fov / 2, (1 / dist[i][0]) * 1000);
+		};
+		drawminimap();
+		if(health > 0) {
+			zz = 0;
+			for(var i = level.length - enemies.length; i < level.length; i++) {
+				if(level[i][0] != 1000) {
+					zz = 1;
 				};
 			};
-			function raycast(alfa,fov){
-				var rays = [],dist=[];
-				for (var ray=alfa-fov;ray<alfa+fov;ray++){
-					rays[ray]=100000;
-					dist[ray]=[100000,0];
-					for(var i=0;i<level.length;i++){
-					  if ((ray>-90 && ray<90)|| ray>=270){
-						  xx=x+2000;
-						  yy=y+2000*Math.tan((ray+0.01)*3.141592/180);
-					  }
-					  else{
-					    xx=x-2000;
-						  yy=y-2000*Math.tan((ray+0.01)*3.141592/180);
-					  };
-						if (ray==alfa){
-						  xxx=xx;
-						  yyy=yy;
-						};
-						var x1=level[i][0],y1=level[i][1],x2=level[i][2],y2=level[i][3],x3=level[i][4];
-						rayy = lineline(x1,y1,x2,y2,x,y,xx,yy,ray);
-						k=-1;
-					if (!((xx < rayy[0] && x < rayy[0]) || (xx > rayy[0] && x > rayy[0]))){
-						  k=1;};
-						rastt = rast(k,x,y,rayy)*Math.cos((ray-alfa+0.1)*3.141592/180);
-					if (rastt>0 && rastt<1 && ray==alfa){
-					  forward=false;
-					};
-						if (dist[ray][0]>rastt && rastt>0){
-							dist[ray]=[rastt,level[i][5]];
-							rayy[ray]=rayy;
-						};
-					};
+			if(zz == 0) {
+				ctx.fillText("You win", example.width / 2, example.height / 2);
+			};
+			if(turnright) {
+				alfa = alfa + sensivity;
+			};
+			if(turnleft) {
+				alfa = alfa - sensivity;
+			};
+			if(forward) {
+				x = x + speed * Math.cos((alfa + 0.01) * 3.141592 / 180);
+				y = y + speed * Math.sin((alfa + 0.01) * 3.141592 / 180);
+			};
+			if(back) {
+				x = x - speed * Math.cos((alfa + 0.01) * 3.141592 / 180);
+				y = y - speed * Math.sin((alfa + 0.01) * 3.141592 / 180);
+			};
+			if(alfa > 360) {
+				alfa = alfa - 360;
+			};
+			if(alfa < 0) {
+				alfa = alfa + 360;
+			};
+		} else {
+			ctx.fillText("Game Over", example.width / 2, example.height / 2);
+			health = 0;
+		};
+	};
+
+	function raycast(alfa, fov) {
+		var rays = [],
+			dist = [];
+		for(var ray = alfa - fov; ray < alfa + fov; ray++) {
+			rays[ray] = 100000;
+			dist[ray] = [100000, 0];
+			for(var i = 0; i < level.length; i++) {
+				if((ray > -90 && ray < 90) || ray >= 270) {
+					xx = x + 2000;
+					yy = y + 2000 * Math.tan((ray + 0.01) * 3.141592 / 180);
+				} else {
+					xx = x - 2000;
+					yy = y - 2000 * Math.tan((ray + 0.01) * 3.141592 / 180);
 				};
-				return dist;
-			};
-			function enemy(){
-			for (var i=0;i<enemies.length;i++){
-					var free=1;
-					for (i1=0;i1<level.length;i1++){
-						var x1=level[i1][0],y1=level[i1][1],x2=level[i1][2],y2=level[i1][3],x3=level[i1][4];
-						rayy = lineline(x1,y1,x2,y2,enemies[i][0],enemies[i][1],x,y,0);
-						k=-1;
-						if (!((enemies[i][0] < rayy[0] && x < rayy[0]) || (enemies[i][0] > rayy[0] && x > rayy[0]))){
-						  k=1;};
-						rastt = rast(k,enemies[i][0],enemies[i][1],rayy);
-						if (rastt>0 && rast(1,x,y,[enemies[i][0],enemies[i][1]])>rastt && level[i1][5]=='green'){
-							free=0;
-						};
+				if(ray == alfa) {
+					xxx = xx;
+					yyy = yy;
 				};
-					if (free ==1 && gri(10)==1){
-						health=health-damage;
-					};
-					};
+				var x1 = level[i][0],
+					y1 = level[i][1],
+					x2 = level[i][2],
+					y2 = level[i][3],
+					x3 = level[i][4];
+				rayy = lineline(x1, y1, x2, y2, x, y, xx, yy, ray);
+				k = -1;
+				if(!((xx < rayy[0] && x < rayy[0]) || (xx > rayy[0] && x > rayy[0]))) {
+					k = 1;
+				};
+				rastt = rast(k, x, y, rayy) * Math.cos((ray - alfa + 0.1) * 3.141592 / 180);
+				if(rastt > 0 && rastt < 1 && ray == alfa) {
+					forward = false;
+				};
+				if(dist[ray][0] > rastt && rastt > 0) {
+					dist[ray] = [rastt, level[i][5]];
+					rayy[ray] = rayy;
+				};
 			};
-			function gri(max) {
-				return Math.floor(Math.random() * Math.floor(max));
+		};
+		return dist;
+	};
+
+	function enemy() {
+		for(var i = 0; i < enemies.length; i++) {
+			var free = 1;
+			for(i1 = 0; i1 < level.length; i1++) {
+				var x1 = level[i1][0],
+					y1 = level[i1][1],
+					x2 = level[i1][2],
+					y2 = level[i1][3],
+					x3 = level[i1][4];
+				rayy = lineline(x1, y1, x2, y2, enemies[i][0], enemies[i][1], x, y, 0);
+				k = -1;
+				if(!((enemies[i][0] < rayy[0] && x < rayy[0]) || (enemies[i][0] > rayy[0] && x > rayy[0]))) {
+					k = 1;
+				};
+				rastt = rast(k, enemies[i][0], enemies[i][1], rayy);
+				if(rastt > 0 && rast(1, x, y, [enemies[i][0], enemies[i][1]]) > rastt && level[i1][5] == 'green') {
+					free = 0;
+				};
 			};
-		</script>
-		<text> by Qwerty_Qwertovich(Alexander Kharitonov)</text>
-	</body>
+			if(free == 1 && gri(10) == 1) {
+				health = health - damage;
+			};
+		};
+	};
+
+	function gri(max) {
+		return Math.floor(Math.random() * Math.floor(max));
+	};
+	</script>
+	<text> by Qwerty_Qwertovich(Alexander Kharitonov)</text>
+</body>
+
 </html>
