@@ -7,14 +7,45 @@
 	<body>
 		<canvas height='320' width='480' id='example'>Update the browser</canvas>
 		<script>
-			var example = document.getElementById("example"),
+			var speed=1,sensivity=2,damage=0.5,mydamage=20;
+			var example = document.getElementById("example");
 			    ctx     = example.getContext('2d');
-			var level =[[0,0,0,80],[0,80,20,80],[20,80,20,90],[20,90,30,90],[30,90,30,80],[30,80,40,80],[40,80,40,110],[40,110,60,110],[60,110,60,80],[60,80,90,80],[90,80,90,0],[90,0,0,0],[20,0,20,20],[30,20,30,70],[80,40,80,70],[80,70,50,70],[50,70,50,40],[50,40,80,40],[80,10,80,20],[80,20,60,20],[60,20,60,10],[60,10,80,10]]
-			var enemies = [[25,85],[10,10],[40,30]]
+			var level =[[0,0,0,80,1,"green"],[0,80,20,80,1,"green"],[20,80,20,90,1,"green"],[20,90,30,90,1,"green"],[30,90,30,80,1,"green"],[30,80,40,80,1,"green"],[40,80,40,110,1,"green"],[40,110,60,110,1,"green"],[60,110,60,80,1,"green"],[60,80,90,80,1,"green"],[90,80,90,0,1,"green"],[90,0,0,0,1,"green"],[20,0,20,20,1,"green"],[30,20,30,70,1,"green"],[80,40,80,70,1,"green"],[80,70,50,70,1,"green"],[50,70,50,40,1,"green"],[50,40,80,40,1,"green"],[80,10,80,20,1,"green"],[80,20,60,20,1,"green"],[60,20,60,10,1,"green"],[60,10,80,10,1,"green"],[40,90,50,90,1,"green"],[0,50,20,50,1,"green"],[20,50,20,40,1,"green"],[20,80,20,70,1,"green"],[25.5,85.5,25,85,1,"red"],[10.5,10.5,10,10,1,"red"],[40.5,30.5,40,30,1,"red"],[25.5,75.5,25,75,1,"red"],[50.5,80.5,50,80,1,"red"],[10.5,40.5,10,40,1,"red"],[10.5,70.5,10,70,1,"red"],[85.5,5.5,85,5,1,"red"]]                                                                
+			var enemies = [[25,85],[10,10],[40,30],[25,75],[50,80],[10,40],[10,70],[85,5]]
 			//var level =[[70,0,70,100]]
 			//var level =[[70,0,70,75],[0,70,100,70],[0,60,50,60],[0,40,100,40]]
 			//var level = [[0,0,80,0]]
-			var x = 50,y=100,a=0,fov=30,alfa=20,xx=0,yy=0,k=-1,xxx=0,yyy=0,turnleft=false,turnright=false, forward=false,speed=0.5,health=100;
+			var x = 50,y=100,a=0,fov=30,alfa=270,xx=0,yy=0,k=-1,xxx=0,yyy=0,turnleft=false,turnright=false, forward=false,health=100,back=false;
+			document.addEventListener("keydown", function(event) {
+				if (event.keyCode==87){
+					forward=true
+				}
+				if (event.keyCode==83){
+					back=true
+				}
+				if (event.keyCode==65){
+					turnleft=true
+				}
+				if (event.keyCode==68){
+					turnright=true
+				}
+				console.log(event.keyCode);
+			});
+			document.addEventListener("keyup", function(event) {
+				if (event.keyCode==87){
+					forward=false
+				}
+				if (event.keyCode==83){
+					back=false
+				}
+				if (event.keyCode==65){
+					turnleft=false
+				}
+				if (event.keyCode==68){
+					turnright=false
+				}
+				console.log(event.keyCode);
+			});
 			example.addEventListener('mousedown',function(e) {
         var rect = example.getBoundingClientRect();
         if(example.height-e.clientY+rect.y<100 && e.clientX-rect.x<example.width/2){
@@ -35,7 +66,7 @@
             turnright=true
           }
         }
-        if(example.height-e.clientY+rect.y>100 && e.clientX-rect.x>100){
+        if(example.height-e.clientY+rect.y>100 && e.clientX-rect.x>100 && e.clientX-rect.x<example.width/2){
           //console.log('forward', forward)
           if (forward){
             forward=false
@@ -44,6 +75,31 @@
             forward=true
           }
         }
+		if (example.height-e.clientY+rect.y>100 && e.clientX-rect.x>example.width/2){
+			dist=raycast(alfa,1)
+			//console.log(dist,dist[alfa],level)
+			if (dist[alfa][1]="red"){
+				t=100000
+				k=0
+				for (var i=0;i<enemies.length;i++){
+					console.log(i,t)
+					if (Math.abs(rast(1,x,y,[enemies[i][0],enemies[i][1]])-dist[alfa][0])<t){
+						t=Math.abs(rast(1,x,y,[enemies[i][0],enemies[i][1]])-dist[alfa][0])
+						k=i
+						}
+						console.log(k,t,Math.abs(rast(1,x,y,[enemies[i][0],enemies[i][1]])-dist[alfa][0]))
+					}
+				level[level.length-enemies.length+k][4]=level[level.length-enemies.length+k][4]-mydamage/100
+				if (level[level.length-enemies.length+k][4]<0){
+				level[level.length-enemies.length+k][0]=1000;
+				level[level.length-enemies.length+k][1]=1000;
+				level[level.length-enemies.length+k][2]=1000;
+				level[level.length-enemies.length+k][3]=1000;
+				enemies[k][0]=1000;
+				enemies[k][1]=1000;
+				}
+			}
+		}
 			});
 			function rast(k,x,y,z){
 				return(k*Math.sqrt((x-z[0])*(x-z[0])+(y-z[1])*(y-z[1])));
@@ -52,7 +108,7 @@
 				xp = ((x1*y2-y1*x2)*(x3-x4)-(x1-x2)*(x3*y4-y3*x4))/((x1-x2)*(y3-y4)-(y1-y2)*(x3-x4));
 				yp = ((x1*y2-y1*x2)*(y3-y4)-(y1-y2)*(x3*y4-y3*x4))/((x1-x2)*(y3-y4)-(y1-y2)*(x3-x4));
 				//console.log(xp,yp,x1,y1,x2,y2)
-	      if ((!((x1+1 < xp && x2+1 < xp) || (x1-1 > xp && x2-1 > xp)))&&(!((y1+1 < yp && y2+1 < yp) || (y1-1 > yp && y2-1 > yp)))){
+	      if ((!((x1+0.1 < xp && x2+0.1 < xp) || (x1-0.1 > xp && x2-0.1 > xp)))&&(!((y1+0.1 < yp && y2+0.1 < yp) || (y1-0.1 > yp && y2-0.1 > yp)))){
 				  //console.log(xp,yp)
 					return [xp,yp];
 				};
@@ -76,7 +132,10 @@
 			  ctx.lineTo(x+1,y+1);
 			  ctx.closePath();
 			  ctx.stroke();
-			  ctx.fillRect(example.width/2,0,1, example.height)
+			  ctx.fillRect(example.width/2,example.height/2,2,2)
+			  ctx.fillText(Math.floor(x),example.width-60,example.height-10)
+			  ctx.fillText(Math.floor(y),example.width-40,example.height-10)
+			  ctx.fillText(Math.floor(alfa),example.width-20,example.height-10)
 			}
 			setInterval(draw, 20);
 			//draw();
@@ -92,31 +151,44 @@
 			    ctx.fillStyle='lightgreen';
 				ctx.fillRect(example.width-110,10,health,20)
 				dist=raycast(alfa,fov);
-				//console.log(dist)
+				enemy()
 				for(var i=alfa-fov;i<alfa+fov;i++){
-				  var color='rgb(0,'+(255-dist[i]*4).toString()+',0)'
+				  var color='rgb(0,'+(255-dist[i][0]*4).toString()+',0)'
 				  ctx.fillStyle=color
+				  if (dist[i][1]=='red'){
+					ctx.fillStyle='red'
+				  }
 				 //console.log(color,toString(dist[i]))
 				 // console.log(dist[i],i)
 					//console.log(alfa,example.width*(i+fov)/fov/2, example.height/2-(1/dist[i])*500, example.width/fov/2, (1/dist[i])*1000)
-					ctx.fillRect(example.width*(i-alfa+fov)/fov/2, example.height/2-(1/dist[i])*500,example.width/fov/2, (1/dist[i])*1000);
+					ctx.fillRect(example.width*(i-alfa+fov)/fov/2, example.height/2-(1/dist[i][0])*500,example.width/fov/2, (1/dist[i][0])*1000);
 				}
 				drawminimap();
-				if (turnright){
-				  alfa=alfa+1
+				if (health>0){
+					if (turnright){
+					  alfa=alfa+sensivity
+					}
+					if (turnleft){
+					  alfa=alfa-sensivity
+					}
+					if (forward){
+					  x=x+speed*Math.cos((alfa+0.01)*3.141592/180)
+					  y=y+speed*Math.sin((alfa+0.01)*3.141592/180)
+					}
+					if (back){
+						x=x-speed*Math.cos((alfa+0.01)*3.141592/180)
+						y=y-speed*Math.sin((alfa+0.01)*3.141592/180)
+					}
+					if (alfa>360){
+					  alfa=alfa-360;
+					}
+					if (alfa<0){
+					  alfa=alfa+360
+					}
 				}
-				if (turnleft){
-				  alfa=alfa-1
-				}
-				if (forward){
-				  x=x+speed*Math.cos((alfa+0.01)*3.141592/180)
-				  y=y+speed*Math.sin((alfa+0.01)*3.141592/180)
-				}
-				if (alfa==361){
-				  alfa=1;
-				}
-				if (alfa==-1){
-				  alfa=359
+				else{
+					ctx.fillText("Game Over",example.width/2,example.height/2)
+					health=0
 				}
 			//	console.log(alfa)
 			};
@@ -124,9 +196,9 @@
 				var rays = [],dist=[]
 				for (var ray=alfa-fov;ray<alfa+fov;ray++){
 					rays[ray]=100000
-					dist[ray]=100000
+					dist[ray]=[100000,0]
 					for(var i=0;i<level.length;i++){
-					  if ((ray>-90 && ray<90)|| ray>270){
+					  if ((ray>-90 && ray<90)|| ray>=270){
 						  xx=x+2000;
 						  yy=y+2000*Math.tan((ray+0.01)*3.141592/180);
 					  }
@@ -153,14 +225,36 @@
 					if (rastt>0 && rastt<1 && ray==alfa){
 					  forward=false
 					}
-						if (dist[ray]>rastt && rastt>0){
-							dist[ray]=rastt;
+						if (dist[ray][0]>rastt && rastt>0){
+							dist[ray]=[rastt,level[i][5]];
 							rayy[ray]=rayy;
 						};
 					};
 				};
 				return dist
-			};
+			}
+			function enemy(){
+			for (var i=0;i<enemies.length;i++){
+					var free=1;
+					//console.log(i)
+					for (i1=0;i1<level.length;i1++){
+						var x1=level[i1][0],y1=level[i1][1],x2=level[i1][2],y2=level[i1][3],x3=level[i1][4];
+						rayy = lineline(x1,y1,x2,y2,enemies[i][0],enemies[i][1],x,y,0);
+						k=-1;
+						if (!((enemies[i][0] < rayy[0] && x < rayy[0]) || (enemies[i][0] > rayy[0] && x > rayy[0]))){
+						  k=1;}
+						rastt = rast(k,enemies[i][0],enemies[i][1],rayy)
+						//console.log(rastt,rast(1,x,y,[enemies[i][0],enemies[i][1]]),i)
+						if (rastt>0 && rast(1,x,y,[enemies[i][0],enemies[i][1]])>rastt && level[i1][5]=='green'){
+							free=0
+						}
+				}
+					if (free ==1 && gri(10)==1){
+					//	console.log("Damage from",i)
+						health=health-damage
+					}
+					};
+			}
 			function gri(max) {
 				return Math.floor(Math.random() * Math.floor(max));
 			};
