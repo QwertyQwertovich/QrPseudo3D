@@ -11,6 +11,8 @@
 	<script>
 	var speed = 1,sensivity = 1,damage = 0.5,mydamage = 20,wallheight = 1.5,fov = 60,health=100;
 	fov = fov / 2;
+	var zs=[]
+	var z=0;
 	wallheight = 1 / wallheight;
 	var example = document.getElementById("example");
 	ctx = example.getContext('2d');
@@ -63,7 +65,7 @@
 	var ys = [100];
 	var level=levels[0];
 	var enemies=enemiess[0];
-	levelcount=1
+	levelcount=1;
 	var x = xs[0],
 		y = ys[0],
 		a = 0,
@@ -73,6 +75,8 @@
 		k = -1,
 		xxx = 0,
 		yyy = 0,
+		zx=0,
+		z=0,
 		turnleft = false,
 		turnright = false,
 		forward = false,
@@ -131,6 +135,7 @@
 			};
 		};
 		if(example.height - e.clientY + rect.y > 100 && e.clientX - rect.x > example.width / 2) {
+		  zx=1;
 			dist = raycast(alfa, 1);
 			if(dist[alfa][1] == "red") {
 				t = 100000;
@@ -192,9 +197,9 @@
 	function draw() {
 		ctx.clearRect(0, 0, example.width, example.height);
 		ctx.fillStyle = 'lightblue';
-		ctx.fillRect(0, 0, example.width, example.height / 2);
+		ctx.fillRect(0, 0, example.width, example.height / 2+z);
 		ctx.fillStyle = 'brown';
-		ctx.fillRect(0, example.height / 2, example.width, example.height / 2);
+		ctx.fillRect(0, example.height / 2+z, example.width, example.height / 2);
 		ctx.fillStyle = 'black';
 		ctx.fillRect(example.width - 112, 8, 104, 24);
 		ctx.fillStyle = 'lightgreen';
@@ -207,7 +212,7 @@
 			if(dist[i][1] == 'red') {
 				ctx.fillStyle = 'red';
 			};
-			ctx.fillRect(example.width * (i - alfa + fov) / fov / 2, example.height / 2 - (1 / dist[i][0]) * 500, example.width / fov / 2, (1 / dist[i][0]) * 1000);
+			ctx.fillRect(example.width * (i - alfa + fov) / fov / 2, example.height / 2 - (1 / dist[i][0]) * 500+z, example.width / fov / 2, (1 / dist[i][0]) * 1000);
 		};
 		drawminimap();
 		if(health > 0) {
@@ -233,6 +238,14 @@
 				  level = levels[currentlevel];
 				  enemies = enemiess[currentlevel];
 				};
+			};
+			if(zx>0){
+			//  console.log(zx,z);
+			  z=(-4/5)*(zx/2)*(zx/2)+10*(zx/2);
+			  zx=zx+1;
+			  if (z==0){
+			    zx=0;
+			  }
 			};
 			if(turnright) {
 				alfa = alfa + sensivity;
