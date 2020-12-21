@@ -9,13 +9,12 @@
 <body>
 	<canvas height='320' width='480' id='example'>Update the browser</canvas>
 	<script>
-	var speed = 1,
-		sensivity = 1,
-		damage = 0.5,
-		mydamage = 2;
+	var speed = 1,sensivity = 1,damage = 0.5,mydamage = 20,wallheight = 1.5,fov = 60,health=100;
+	fov = fov / 2;
+	wallheight = 1 / wallheight;
 	var example = document.getElementById("example");
 	ctx = example.getContext('2d');
-	var level = [
+	var levels = [[
 		[0, 0, 0, 80, 1, "green"],
 		[0, 80, 20, 80, 1, "green"],
 		[20, 80, 20, 90, 1, "green"],
@@ -49,9 +48,8 @@
 		[50.5, 80.5, 50, 80, 1, "red"],
 		[10.5, 40.5, 10, 40, 1, "red"],
 		[10.5, 70.5, 10, 70, 1, "red"],
-		[85.5, 5.5, 85, 5, 1, "red"]
-	];
-	var enemies = [
+		[85.5, 5.5, 85, 5, 1, "red"]]];
+	var enemiess = [[
 		[25, 85],
 		[10, 10],
 		[40, 30],
@@ -60,11 +58,15 @@
 		[10, 40],
 		[10, 70],
 		[85, 5]
-	];
-	var x = 50,
-		y = 100,
+	]];
+	var xs = [50];
+	var ys = [100];
+	var level=levels[0];
+	var enemies=enemiess[0];
+	levelcount=1
+	var x = xs[0],
+		y = ys[0],
 		a = 0,
-		fov = 30,
 		alfa = 270,
 		xx = 0,
 		yy = 0,
@@ -74,8 +76,8 @@
 		turnleft = false,
 		turnright = false,
 		forward = false,
-		health = 100,
-		back = false;
+		back = false,
+		currentlevel = 0;
 	document.addEventListener("keydown", function(event) {
 		if(event.keyCode == 87) {
 			forward = true;
@@ -217,6 +219,20 @@
 			};
 			if(zz == 0) {
 				ctx.fillText("You win", example.width / 2, example.height / 2);
+				if (currentlevel < levelcount){
+				  currentlevel += 1;
+				  x=xs[currentlevel];
+				  y=ys[currentlevel];
+				  level = levels[currentlevel];
+				  enemies = enemiess[currentlevel];
+				}
+				else{
+				  currentlevel=0;
+				  x=xs[currentlevel];
+				  y=ys[currentlevel];
+				  level = levels[currentlevel];
+				  enemies = enemiess[currentlevel];
+				};
 			};
 			if(turnright) {
 				alfa = alfa + sensivity;
@@ -272,7 +288,7 @@
 				if(!((xx < rayy[0] && x < rayy[0]) || (xx > rayy[0] && x > rayy[0]))) {
 					k = 1;
 				};
-				rastt = rast(k, x, y, rayy) * Math.cos((ray - alfa + 0.1) * 3.141592 / 180);
+				rastt = rast(k, x, y, rayy) * Math.cos((ray - alfa + 0.1) * 3.141592 / 180) * wallheight;
 				if(rastt > 0 && rastt < 1 && ray == alfa) {
 					forward = false;
 				};
