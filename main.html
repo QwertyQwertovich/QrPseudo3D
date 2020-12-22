@@ -9,7 +9,8 @@
 <body>
 	<canvas height='320' width='480' id='example'>Update the browser</canvas>
 	<script>
-	var speed = 1,sensivity = 1,damage = 0.5,mydamage = 20,wallheight = 1.5,fov = 60,health=100;
+	var speed = 1,sensivity = 1,damage = 0.5,mydamage = 20,wallheight = 1.5,fov = 60,health=100,jumppower=15,renderdistancefade=0.5,renderdistance=100,jumpdelta=1;
+	renderdistance=1/renderdistance;
 	fov = fov / 2;
 	var zs=[]
 	var z=0;
@@ -17,40 +18,40 @@
 	var example = document.getElementById("example");
 	ctx = example.getContext('2d');
 	var levels = [[
-		[0, 0, 0, 80, 1, "green"],
-		[0, 80, 20, 80, 1, "green"],
-		[20, 80, 20, 90, 1, "green"],
-		[20, 90, 30, 90, 1, "green"],
-		[30, 90, 30, 80, 1, "green"],
-		[30, 80, 40, 80, 1, "green"],
-		[40, 80, 40, 110, 1, "green"],
-		[40, 110, 60, 110, 1, "green"],
-		[60, 110, 60, 80, 1, "green"],
-		[60, 80, 90, 80, 1, "green"],
-		[90, 80, 90, 0, 1, "green"],
-		[90, 0, 0, 0, 1, "green"],
-		[20, 0, 20, 20, 1, "green"],
-		[30, 20, 30, 70, 1, "green"],
-		[80, 40, 80, 70, 1, "green"],
-		[80, 70, 50, 70, 1, "green"],
-		[50, 70, 50, 40, 1, "green"],
-		[50, 40, 80, 40, 1, "green"],
-		[80, 10, 80, 20, 1, "green"],
-		[80, 20, 60, 20, 1, "green"],
-		[60, 20, 60, 10, 1, "green"],
-		[60, 10, 80, 10, 1, "green"],
-		[40, 90, 50, 90, 1, "green"],
-		[0, 50, 20, 50, 1, "green"],
-		[20, 50, 20, 40, 1, "green"],
-		[20, 80, 20, 70, 1, "green"],
-		[25.5, 85.5, 25, 85, 1, "red"],
-		[10.5, 10.5, 10, 10, 1, "red"],
-		[40.5, 30.5, 40, 30, 1, "red"],
-		[25.5, 75.5, 25, 75, 1, "red"],
-		[50.5, 80.5, 50, 80, 1, "red"],
-		[10.5, 40.5, 10, 40, 1, "red"],
-		[10.5, 70.5, 10, 70, 1, "red"],
-		[85.5, 5.5, 85, 5, 1, "red"]]];
+		[0, 0, 0, 80, 1,"wall", 0, 255, 0],
+		[0, 80, 20, 80, 1, "wall", 0, 255, 0],
+		[20, 80, 20, 90, 1, "wall", 0, 255, 0],
+		[20, 90, 30, 90, 1, "wall", 0, 255, 0],
+		[30, 90, 30, 80, 1, "wall", 0, 255, 0],
+		[30, 80, 40, 80, 1, "wall", 0, 255, 0],
+		[40, 80, 40, 110, 1, "wall", 0, 255, 0],
+		[40, 110, 60, 110, 1, "wall", 0, 255, 0],
+		[60, 110, 60, 80, 1, "wall", 0, 255, 0],
+		[60, 80, 90, 80, 1, "wall", 0, 255, 0],
+		[90, 80, 90, 0, 1, "wall", 0, 255, 0],
+		[90, 0, 0, 0, 1, "wall", 0, 255, 0],
+		[20, 0, 20, 20, 1, "wall", 0, 255, 0],
+		[30, 20, 30, 70, 1, "wall", 0, 255, 0],
+		[80, 40, 80, 70, 1, "wall", 0, 255, 0],
+		[80, 70, 50, 70, 1, "wall", 0, 255, 0],
+		[50, 70, 50, 40, 1, "wall", 0, 255, 0],
+		[50, 40, 80, 40, 1, "wall", 0, 255, 0],
+		[80, 10, 80, 20, 1, "wall", 0, 255, 0],
+		[80, 20, 60, 20, 1, "wall", 0, 255, 0],
+		[60, 20, 60, 10, 1, "wall", 0, 255, 0],
+		[60, 10, 80, 10, 1, "wall", 0, 255, 0],
+		[40, 90, 50, 90, 1, "wall", 0, 255, 0],
+		[0, 50, 20, 50, 1, "wall", 0, 255, 0],
+		[20, 50, 20, 40, 1, "wall", 0, 255, 0],
+		[20, 80, 20, 70, 1, "wall", 0, 255, 0],
+		[25.5, 85.5, 25, 85, 1, "enemy", 255, 0, 0],
+		[10.5, 10.5, 10, 10, 1, "enemy", 255, 0, 0],
+		[40.5, 30.5, 40, 30, 1, "enemy", 255, 0, 0],
+		[25.5, 75.5, 25, 75, 1, "enemy", 255, 0, 0],
+		[50.5, 80.5, 50, 80, 1, "enemy", 255, 0, 0],
+		[10.5, 40.5, 10, 40, 1, "enemy", 255, 0, 0],
+		[10.5, 70.5, 10, 70, 1, "enemy", 255, 0, 0],
+		[85.5, 5.5, 85, 5, 1, "enemy", 255, 0, 0]]];
 	var enemiess = [[
 		[25, 85],
 		[10, 10],
@@ -137,7 +138,7 @@
 		if(example.height - e.clientY + rect.y > 100 && e.clientX - rect.x > example.width / 2) {
 		  zx=1;
 			dist = raycast(alfa, 1);
-			if(dist[alfa][1] == "red") {
+			if(dist[alfa][2] == "enemy") {
 				t = 100000;
 				k = 0;
 				for(var i = 0; i < enemies.length; i++) {
@@ -199,7 +200,7 @@
 		ctx.fillStyle = 'lightblue';
 		ctx.fillRect(0, 0, example.width, example.height / 2+z);
 		ctx.fillStyle = 'brown';
-		ctx.fillRect(0, example.height / 2+z, example.width, example.height / 2);
+		ctx.fillRect(0, example.height / 2, example.width, example.height / 2);
 		ctx.fillStyle = 'black';
 		ctx.fillRect(example.width - 112, 8, 104, 24);
 		ctx.fillStyle = 'lightgreen';
@@ -207,12 +208,9 @@
 		dist = raycast(alfa, fov);
 		enemy();
 		for(var i = alfa - fov; i < alfa + fov; i++) {
-			var color = 'rgb(0,' + (255 - dist[i][0] * 4).toString() + ',0)';
+			var color = 'rgb('+ (dist[i][3] - dist[i][0] * 4*renderdistancefade).toString() + ',' + (dist[i][4] - dist[i][0] * 4*renderdistancefade).toString() + ','+ (dist[i][5] - dist[i][0] * 4*renderdistancefade).toString() + ')';
 			ctx.fillStyle = color;
-			if(dist[i][1] == 'red') {
-				ctx.fillStyle = 'red';
-			};
-			ctx.fillRect(example.width * (i - alfa + fov) / fov / 2, example.height / 2 - (1 / dist[i][0]) * 500+z, example.width / fov / 2, (1 / dist[i][0]) * 1000);
+			ctx.fillRect(example.width * (i - alfa + fov) / fov / 2, example.height / 2 - (1 / dist[i][0]) * 500+z*1/dist[i][0]*jumpdelta, example.width / fov / 2, (1 / dist[i][0]) * 1000);
 		};
 		drawminimap();
 		if(health > 0) {
@@ -241,7 +239,7 @@
 			};
 			if(zx>0){
 			//  console.log(zx,z);
-			  z=(-4/5)*(zx/2)*(zx/2)+10*(zx/2);
+			  z=jumppower*((-4/5)*(zx/2)*(zx/2)+10*(zx/2));
 			  zx=zx+1;
 			  if (z==0){
 			    zx=0;
@@ -306,7 +304,7 @@
 					forward = false;
 				};
 				if(dist[ray][0] > rastt && rastt > 0) {
-					dist[ray] = [rastt, level[i][5]];
+					dist[ray] = [rastt, level[i][4],level[i][5],level[i][6],level[i][7],level[i][8]];
 					rayy[ray] = rayy;
 				};
 			};
@@ -329,7 +327,7 @@
 					k = 1;
 				};
 				rastt = rast(k, enemies[i][0], enemies[i][1], rayy);
-				if(rastt > 0 && rast(1, x, y, [enemies[i][0], enemies[i][1]]) > rastt && level[i1][5] == 'green') {
+				if(rastt > 0 && rast(1, x, y, [enemies[i][0], enemies[i][1]]) > rastt && level[i1][5] == 'wall') {
 					free = 0;
 				};
 			};
