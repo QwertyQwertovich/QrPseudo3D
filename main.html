@@ -7,9 +7,9 @@
 </head>
 
 <body>
-	<canvas height='320' width='480' id='example'>Update the browser</canvas>
+	<canvas height='480' width='720' id='example'>Update the browser</canvas>
 	<script>
-	var speed = 1,sensivity = 1,damage = 0.5,mydamage = 20,wallheight = 1.5,fov = 60,health=100,jumppower=15,renderdistancefade=0.5,renderdistance=100,jumpdelta=1;
+	var speed = 1,sensivity = 1,damage = 0.5,mydamage = 20,wallheight = 1.5,fov = 60,health=100,jumppower=15,renderdistancefade=0.5,renderdistance=100,jumpdelta=1,rainbowwalls=true,enemyspinvel=4,enemyradius=0.5;
 	renderdistance=1/renderdistance;
 	fov = fov / 2;
 	var zs=[]
@@ -52,6 +52,17 @@
 		[10.5, 40.5, 10, 40, 1, "enemy", 255, 0, 0],
 		[10.5, 70.5, 10, 70, 1, "enemy", 255, 0, 0],
 		[85.5, 5.5, 85, 5, 1, "enemy", 255, 0, 0]]];
+	if (rainbowwalls){
+		for (var i=0;i<levels.length;i++){
+			for (var j=0;j<levels[i].length;j++){
+				if (levels[i][j][5]=="wall"){
+					levels[i][j][6]=gri(255);
+					levels[i][j][7]=gri(255);
+					levels[i][j][8]=gri(255);
+				};
+			};
+		};
+	};
 	var enemiess = [[
 		[25, 85],
 		[10, 10],
@@ -83,6 +94,7 @@
 		forward = false,
 		back = false,
 		currentlevel = 0;
+		frame=0;
 	document.addEventListener("keydown", function(event) {
 		if(event.keyCode == 87) {
 			forward = true;
@@ -95,6 +107,9 @@
 		};
 		if(event.keyCode == 68) {
 			turnright = true;
+		};
+		if(event.keyCode == 32) {
+			zx=1;
 		};
 		console.log(event.keyCode);
 	});
@@ -136,7 +151,6 @@
 			};
 		};
 		if(example.height - e.clientY + rect.y > 100 && e.clientX - rect.x > example.width / 2) {
-		  zx=1;
 			dist = raycast(alfa, 1);
 			if(dist[alfa][2] == "enemy") {
 				t = 100000;
@@ -196,6 +210,7 @@
 	setInterval(draw, 20);
 
 	function draw() {
+		frame=frame+1;
 		ctx.clearRect(0, 0, example.width, example.height);
 		ctx.fillStyle = 'lightblue';
 		ctx.fillRect(0, 0, example.width, example.height / 2+z);
@@ -214,9 +229,18 @@
 		};
 		drawminimap();
 		if(health > 0) {
+			//console.log(enemy.length)
+			for (var i=0;i<enemies.length;i++){
+				//console.log(1)
+				var j = level.length - enemies.length + i
+				level[j][0]=enemies[i][0]-Math.cos(frame*enemyspinvel* 3.141592 / 180)/2
+				level[j][1]=enemies[i][1]-Math.sin(frame*enemyspinvel* 3.141592 / 180)/2
+				level[j][2]=enemies[i][0]+Math.cos(frame*enemyspinvel* 3.141592 / 180)/2
+				level[j][3]=enemies[i][1]+Math.sin(frame*enemyspinvel* 3.141592 / 180)/2
+			};
 			zz = 0;
 			for(var i = level.length - enemies.length; i < level.length; i++) {
-				if(level[i][0] != 1000) {
+				if(level[i][0] < 999 ) {
 					zz = 1;
 				};
 			};
