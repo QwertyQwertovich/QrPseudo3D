@@ -9,7 +9,7 @@
 <body>
 	<canvas height='480' width='720' id='example'>Update the browser</canvas>
 	<script>
-	var speed = 1,sensivity = 1,damage = 0.5,mydamage = 20,wallheight = 1.5,fov = 60,health=100,jumppower=15,renderdistancefade=0.5,renderdistance=100,jumpdelta=1,rainbowwalls=true,enemyspinvel=4,enemyradius=0.5;
+	var speed = 1,sensivity = 1,damage = 0.5,mydamage = 20,wallheight = 1.5,fov = 60,health=10000,jumppower=15,renderdistancefade=0.5,renderdistance=100,jumpdelta=1,rainbowwalls=true,enemyspinvel=4,enemyradius=0.5,enemyspeed = 0.01;
 	//renderdistance=1/renderdistance;
 	fov = fov / 2;
 	var zs=[]
@@ -151,7 +151,7 @@
 			};
 		};
 		if(example.height - e.clientY + rect.y > 100 && e.clientX - rect.x > example.width / 2) {
-			dist = raycast(alfa, 1);
+			dist = raycast(x,y,alfa, 1);
 			if(dist[alfa][2] == "enemy") {
 				t = 100000;
 				k = 0;
@@ -220,8 +220,9 @@
 		ctx.fillRect(example.width - 112, 8, 104, 24);
 		ctx.fillStyle = 'lightgreen';
 		ctx.fillRect(example.width - 110, 10, health, 20);
-		dist = raycast(alfa, fov);
+		dist = raycast(x,y,alfa, fov);
 		enemy();
+		enemywalk();
 		for(var i = alfa - fov; i < alfa + fov; i++) {
 			var color = 'rgb('+ (dist[i][3] - dist[i][0] * 4*renderdistancefade).toString() + ',' + (dist[i][4] - dist[i][0] * 4*renderdistancefade).toString() + ','+ (dist[i][5] - dist[i][0] * 4*renderdistancefade).toString() + ')';
 			ctx.fillStyle = color;
@@ -295,7 +296,7 @@
 		};
 	};
 
-	function raycast(alfa, fov) {
+	function raycast(x,y,alfa, fov) {
 		var rays = [],
 			dist = [];
 		for(var ray = alfa - fov; ray < alfa + fov; ray++) {
@@ -328,8 +329,8 @@
 					forward = false;
 				};
 				if(dist[ray][0] > rastt && rastt > 0) {
-					dist[ray] = [rastt, level[i][4],level[i][5],level[i][6],level[i][7],level[i][8]];
 					rayy[ray] = rayy;
+					dist[ray] = [rastt, level[i][4],level[i][5],level[i][6],level[i][7],level[i][8],rayy[ray]];
 				};
 				//console.log(dist[ray][0],renderdistance)
 				if (dist[ray][0]>renderdistance){
@@ -339,7 +340,38 @@
 		};
 		return dist;
 	};
-
+	function enemywalk(){
+		for (var i=0;i<enemies.length;i++){
+			var free = 1;
+			for(i1 = 0; i1 < level.length; i1++) {
+				var x1 = level[i1][0],
+					y1 = level[i1][1],
+					x2 = level[i1][2],
+					y2 = level[i1][3],
+					x3 = level[i1][4];
+				rayy = lineline(x1, y1, x2, y2, enemies[i][0], enemies[i][1], x, y, 0);
+				k = -1;
+				if(!((enemies[i][0] < rayy[0] && x < rayy[0]) || (enemies[i][0] > rayy[0] && x > rayy[0]))) {
+					k = 1;
+				};
+				rastt = rast(k, enemies[i][0], enemies[i][1], rayy);
+				if(rastt > 0 && rast(1, x, y, [enemies[i][0], enemies[i][1]]) > rastt && level[i1][5] == 'wall') {
+					free = 0;
+				};
+			};
+			if (free==1){
+				var ugol = Math.atan2((y-enemies[i][0]),(x-enemies[i][1]));
+				console.log(ugol)
+				enemies[i][0]=enemies[i][0]+enemyspeed*Math.sin(ugol)
+				enemies[i][1]=enemies[i][1]+enemyspeed*Math.cos(ugol)
+			}
+			/*else{
+				free=1
+				dist=raycast(enemies[i][0],enemies[i][1],0,360);
+				for ()
+			};*/
+		};
+	};
 	function enemy() {
 		for(var i = 0; i < enemies.length; i++) {
 			var free = 1;
@@ -362,6 +394,7 @@
 			if(free == 1 && gri(10) == 1) {
 				health = health - damage;
 			};
+			
 		};
 	};
 
