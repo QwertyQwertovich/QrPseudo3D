@@ -10,7 +10,7 @@
 	<canvas height='480' width='720' id='example'>Update the browser</canvas>
 	<script>
 	var speed = 1,sensivity = 1,damage = 0.5,mydamage = 20,wallheight = 1.5,fov = 60,health=100,jumppower=15,renderdistancefade=0.5,renderdistance=100,jumpdelta=1,rainbowwalls=true,enemyspinvel=4,enemyradius=0.5;
-	renderdistance=1/renderdistance;
+	//renderdistance=1/renderdistance;
 	fov = fov / 2;
 	var zs=[]
 	var z=0;
@@ -108,7 +108,7 @@
 		if(event.keyCode == 68) {
 			turnright = true;
 		};
-		if(event.keyCode == 32) {
+		if(event.keyCode == 32 && zx==1) {
 			zx=1;
 		};
 		console.log(event.keyCode);
@@ -330,6 +330,10 @@
 				if(dist[ray][0] > rastt && rastt > 0) {
 					dist[ray] = [rastt, level[i][4],level[i][5],level[i][6],level[i][7],level[i][8]];
 					rayy[ray] = rayy;
+				};
+				//console.log(dist[ray][0],renderdistance)
+				if (dist[ray][0]>renderdistance){
+				  dist[ray][0]=200;
 				};
 			};
 		};
